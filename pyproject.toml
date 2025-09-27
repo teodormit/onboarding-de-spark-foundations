@@ -1,0 +1,24 @@
+[project]
+name = "customer_transaction_etl"
+version = "0.1.0"
+dependencies = [
+  "pyspark>=3.4",
+  "typer>=0.12",
+  "pydantic>=2.6",
+  "chispa>=0.10",
+  "pytest>=8.0",
+  "rich>=13.7"
+]
+
+[tool.setuptools.package-dir]
+"" = "src/python"
+
+
+[tool.setuptools.packages.find]
+where = ["src/python"]
+include = ["customer_transaction_etl*"]
+
+
+[tool.pytest.ini_options]
+pythonpath = ["src/python"]
+
