@@ -19,23 +19,23 @@ Total planned time: ~70 hours (3–4 hrs/day × 20 days)
 - Planned: 6 hrs  
 - Tasks:
   - ✅ Review parallel vs. distributed computing
-  - Refresh Python & SQL basics
-  - Install & test PySpark
-  - Configure AWS CLI & Terraform
-- Status: 0%  
-- Hours logged: 0 / 6  
+  - ✅ Refresh Python & SQL basics
+  - ✅Install & test PySpark
+  - ✅Configure AWS CLI & Terraform
+- Status: 100%  
+- Hours logged: X / 6  
 - Notes: …
 ---
 
 ### Milestone 2 — Spark Core & PySpark Basics (Days 3–5)
 - Planned: 12 hrs  
 - Tasks:
-  - SparkSession, RDDs vs. DataFrames
-  - Transformations vs. Actions, lazy evaluation
-  - Load & process CSV/JSON locally
-  - Run PySpark scripts via spark-submit
-- Status: 0%  
-- Hours logged: 0 / 12  
+  - ✅SparkSession, RDDs vs. DataFrames
+  - ✅Transformations vs. Actions, lazy evaluation
+  - ✅Load & process CSV/JSON locally
+  - ✅Run PySpark scripts via spark-submit
+- Status: 100%  
+- Hours logged: 12 / 12  
 - Notes: …
 
 ---
@@ -43,12 +43,12 @@ Total planned time: ~70 hours (3–4 hrs/day × 20 days)
 ### Milestone 3 — DataFrame Operations & Spark SQL (Days 6–8)
 - Planned: 9 hrs  
 - Tasks:
-  - Joins, aggregations, groupBy, ordering
-  - Use SQL queries with DataFrames
+  - ✅Joins, aggregations, groupBy, ordering
+  - ✅Use SQL queries with DataFrames
   - Implement UDFs
-  - Work with Parquet, JSON, CSV
-- Status: 0%  
-- Hours logged: 0 / 9  
+  - ✅Work with Parquet, JSON, CSV
+- Status: 90%  
+- Hours logged: 9 / 9  
 - Notes: …
 
 ---
@@ -56,12 +56,12 @@ Total planned time: ~70 hours (3–4 hrs/day × 20 days)
 ### Milestone 4 — Spark Architecture & Optimization (Days 9–10)
 - Planned: 7 hrs  
 - Tasks:
-  - Driver, Executors, Cluster Manager
-  - Partitioning & shuffling
-  - Performance basics (cache, explain plan)
+  - ✅Driver, Executors, Cluster Manager
+  - ✅Partitioning & shuffling
+  - ✅Performance basics (cache, explain plan)
   - Inspect Spark UI
-- Status: 0%  
-- Hours logged: 0 / 7  
+- Status: 100%  
+- Hours logged: 7 / 7  
 - Notes: …
 
 ---
@@ -123,3 +123,8 @@ Pipeline: S3 (raw) → Glue (PySpark ETL) → S3 (processed) / Redshift → Quer
 ## How to use this file
 - Update X, Y, Z and each milestone's "Status" and "Hours logged" as you progress.  
 - Keep short daily notes under each milestone's
+
+
+
+# Concepts to Learn and Master next
+### Decorators and General-Purpose Decorators with *args and **kwargs

@@ -1,0 +1,59 @@
+[
+  {
+    "customer_id": "C001",
+    "order_id": "O001",
+    "products": [
+      {
+        "product_id": "P001",
+        "name": "Product A",
+        "quantity": "2,00",
+        "price": "10,99"
+      },
+      {
+        "product_id": "P002",
+        "name": " Product B",
+        "quantity": "1",
+        "price": " 5.99 "
+      }
+    ],
+    "purchase_date": " 2023-01-01"
+  },
+  {
+    "customer_id": "C002",
+    "order_id": "O002",
+    "products": [
+      {
+        "product_id": "P001",
+        "name": "Product A",
+        "quantity": "3,00",
+        "price": "10,99"
+      },
+      {
+        "product_id": "P003",
+        "name": "Product C",
+        "quantity": " 2",
+        "price": "7.99"
+      }
+    ],
+    "purchase_date": "2023-01-02 "
+  },
+  {
+    "customer_id": "C003",
+    "order_id": "O003",
+    "products": [
+      {
+        "product_id": "P002",
+        "name": "Product B",
+        "quantity": " 1",
+        "price": "5,99"
+      },
+      {
+        "product_id": "P003",
+        "name": "Product C",
+        "quantity": "4,00",
+        "price": " 7,99 "
+      }
+    ],
+    "purchase_date": "2023-01-03"
+  }
+]

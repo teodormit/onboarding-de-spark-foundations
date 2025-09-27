@@ -1,0 +1,13 @@
+from pyspark.sql import DataFrame
+
+def explode_to_lines(df_raw: DataFrame) -> DataFrame:
+    ...
+
+def cleanse_and_cast(df_lines: DataFrame) -> DataFrame:
+    ...
+
+def deduplicate(df_clean: DataFrame) -> DataFrame:
+    ...
+
+def with_line_amount(df: DataFrame) -> DataFrame:
+    ...
