@@ -1,7 +1,7 @@
 # src/python/ecommerce/transforms/steps.py
 from pyspark.sql import DataFrame, functions as F, Window
 from .base import TransformStep
-from decimal import Decimal
+#from decimal import Decimal
 
 class ExplodeToLines(TransformStep):
     """Explode nested products into one row per (order_id, product_id).
