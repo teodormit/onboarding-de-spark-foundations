@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Paths:
-    data_root: str = os.getenv("DATA_ROOT", "./data")
+    data_root: str = os.getenv("DATA_ROOT", "/home/iceberg/data")
     raw: str = os.path.join(data_root, "raw")
     silver: str = os.path.join(data_root, "silver")
     gold: str = os.path.join(data_root, "gold")

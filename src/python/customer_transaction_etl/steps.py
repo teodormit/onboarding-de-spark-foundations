@@ -1,6 +1,7 @@
 # src/python/ecommerce/transforms/steps.py
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame, functions as F, Window
 from .base import TransformStep
+from decimal import Decimal
 
 class ExplodeToLines(TransformStep):
     """Explode nested products into one row per (order_id, product_id).
@@ -99,21 +100,66 @@ class CleanseAndCast(TransformStep):
         )
         
         # --- cast date (with a simple fallback) ---
-        date1 = F.to_date(F.col("purchase_date"), "dd-MM-yyyy")
-        date2 = F.to_date(F.col("purchase_date"), "dd/MM/yyyy")  # optional fallback
+        date1 = F.to_date(F.col("purchase_date"), "yyyy-MM-dd")
+        date2 = F.to_date(F.col("purchase_date"), "yyyy/MM/dd")  # optional fallback
         out = out.withColumn("purchase_date", F.coalesce(date1, date2))
 
 
         return out
 
 class Deduplicate(TransformStep):
-    """Drop duplicate order lines or merge them (policy: keep first)."""
-    def __init__(self): super().__init__("deduplicate")
+    """
+    Remove duplicate order lines by a key (default: order_id + product_id).
+
+    Strategies:
+      - "drop":          fast, keep an arbitrary row (Spark's dropDuplicates)
+      - "prefer_latest": deterministic; keep the row with the latest purchase_date
+    """
+    
+    name = "deduplicate_lines"
+
+    def __init__(self, key_cols=("order_id", "product_id"), strategy: str = "prefer_latest"):
+        self.key_cols = list(key_cols)
+        self.strategy = strategy
+    
     def transform(self, df: DataFrame) -> DataFrame:
-        return df.dropDuplicates(["order_id", "product_id"])
+        if self.strategy == "drop":
+            return df.dropDuplicates(self.key_cols)
+        
+               # otherwise "prefer_latest" is used. It partitions by key_cols and orders by purchase_date desc to keep the only latest.
+        w = Window.partitionBy(*[F.col(c) for c in self.key_cols]) \
+                  .orderBy(F.col("purchase_date").desc_nulls_last())
+        return (df
+                .withColumn("_rn", F.row_number().over(w))
+                .where(F.col("_rn") == 1)
+                .drop("_rn"))
+
 
 class WithLineAmount(TransformStep):
-    """Compute line_amount = quantity * price."""
-    def __init__(self): super().__init__("with_line_amount")
+    """
+    Compute line_amount = quantity * price.
+    - quantity: int
+    - price: decimal(10,2)
+    - line_amount: decimal(18,2)   (roomy to avoid overflow)
+    """
+    name = "with_line_amount"
+    
     def transform(self, df: DataFrame) -> DataFrame:
-        return df.withColumn("line_amount", F.col("quantity") * F.col("price"))
+        # Cast quantity to a decimal to control the resulting precision/scale deterministically.
+        qty_dec = F.col("quantity").cast("decimal(10,0)")
+        line_amt = (qty_dec * F.col("price")).cast("decimal(18,2)")
+        return df.withColumn("line_amount", line_amt)
+
+class WithCustomerTotalRevenue:
+    """
+    Add a column 'customer_total_revenue' = SUM(line_amount) per customer.
+    Uses a window so the value is available on every row for that customer.
+    """
+    name = "with_customer_total_revenue"
+
+    def __init__(self, col_name: str = "customer_total_revenue"):
+        self.col_name = col_name
+
+    def transform(self, df: DataFrame) -> DataFrame:
+        w = Window.partitionBy("customer_id")
+        return df.withColumn(self.col_name, F.sum("line_amount").over(w))
