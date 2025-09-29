@@ -2,7 +2,7 @@
 What this CLI will do
 raw-to-silver
     -Read raw JSON for a given ingest_date
-    -Run your steps: ExplodeToLines → CleanseAndCast → DeduplicateLines → WithLineAmount → WithCustomerTotalRevenue
+    -Run your steps: ExplodeToLines → CleanseAndCast → Deduplicate → WithLineAmount → WithCustomerTotalRevenue
     -Quarantine rows missing critical fields (to an _errors folder)
     -Incremental write: overwrite only the affected purchase_date partitions in silver (dynamic partition overwrite)
 
@@ -17,19 +17,25 @@ silver-to-gold
 import os
 from datetime import date
 import typer
+import time
 from pyspark.sql import functions as F
 
-from .spark import SparkSessionFactory
+from .session import SparkSessionFactory
 from .config import paths, opts
-from .io.readers import RawJsonReader
-from .transforms.steps import (
-    ExplodeToLines, CleanseAndCast, DeduplicateLines,
+from .io import read_raw_json
+from .steps import (
+    ExplodeToLines, CleanseAndCast, Deduplicate,
     WithLineAmount, WithCustomerTotalRevenue
 )
 from .aggregates import product_revenue, top_products_by_revenue, average_order_value
 
-
 app = typer.Typer(help="Customer Data ETL: raw→silver→gold")  ## CLI librabry for Python
+
+def _ts():
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+
+def _echo(msg):
+    typer.echo(f"[{_ts()}] {msg}")
 
 CRITICAL_COLS = ["order_id", "product_id", "purchase_date", "quantity", "price"]
 
@@ -66,12 +72,16 @@ def raw_to_silver(
     # Input
     raw_glob = os.path.join(paths.raw, f"ingest_date={ingest_date}", "*.json")
     typer.echo(f"Reading raw: {raw_glob}")
-    df_raw = RawJsonReader(spark).read(raw_glob)
+    df_raw = read_raw_json(spark).read(raw_glob)
 
+    _echo(f"Reading raw from: {raw_glob}")
+    raw_cnt = df_raw.count()
+    _echo(f"Raw rows: {raw_cnt}")
+    
     # Transform pipeline (explicit, readable)
     df = ExplodeToLines().transform(df_raw)
     df = CleanseAndCast().transform(df)
-    df = DeduplicateLines(strategy=dedup_strategy).transform(df)
+    df = Deduplicate(strategy=dedup_strategy).transform(df)
     df = WithLineAmount().transform(df)
     df = WithCustomerTotalRevenue().transform(df)
 
@@ -103,6 +113,7 @@ def raw_to_silver(
         .parquet(paths.silver))
 
     typer.echo(f"Done. Silver written to: {paths.silver}")
+    _echo("Raw to Silver done")
 
 
 @app.command()

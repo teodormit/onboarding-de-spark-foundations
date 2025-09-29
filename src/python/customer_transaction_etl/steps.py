@@ -143,6 +143,8 @@ class WithLineAmount(TransformStep):
     - line_amount: decimal(18,2)   (roomy to avoid overflow)
     """
     name = "with_line_amount"
+    def __init__(self):
+        super().__init__(self.name)
     
     def transform(self, df: DataFrame) -> DataFrame:
         # Cast quantity to a decimal to control the resulting precision/scale deterministically.
@@ -158,6 +160,7 @@ class WithCustomerTotalRevenue:
     name = "with_customer_total_revenue"
 
     def __init__(self, col_name: str = "customer_total_revenue"):
+        super().__init__(self.name)
         self.col_name = col_name
 
     def transform(self, df: DataFrame) -> DataFrame:
